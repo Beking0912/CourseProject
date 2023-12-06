@@ -46,6 +46,9 @@ br_0
 br_1
 ```
 
+# Part 2
+describe part 2 here...
+
 ## Manually Compile & Run
 ```
 $ mkdir build
@@ -84,5 +87,3 @@ $ ./a.out
 - **Changes made:** added function getch; moved the main to the end.
 - **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
 
-
-small contrived program
