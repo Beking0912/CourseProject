@@ -59,3 +59,30 @@ $ clang -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c fileX.c -g
 $ cc fileX.o rtlib.o
 $ ./a.out
 ```
+
+## Test Files
+
+### **test0.c**
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** execute the `setup_and_run.sh` script.
+
+### **test1.c**
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+
+### **test2.c**
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+
+### **test3.c**
+- **Type:** real-world substitute
+- **Code source:** [github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
+- **Number of non-comment non-blank lines:** 583 lines
+- **Changes made:** added function getch; moved the main to the end.
+- **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
+
+
+small contrived program

@@ -15,10 +15,10 @@ cd ..
 cc -g -c logPrint.c
 
 # Step 5: Compile fileX.c with the clang plugin
-clang -fno-discard-value-names -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c testOne.c -g
+clang -fno-discard-value-names -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c test0.c -g
 
 # Step 6: Link the object files and create the executable
-cc -g testOne.o logPrint.o -o a.out
+cc -g test0.o logPrint.o -o a.out
 
 # Step 7: Run the executable
 ./a.out
