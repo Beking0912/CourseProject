@@ -88,7 +88,8 @@ $ ./a.out
 - **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
 
 # Repo Links
-1. Part 1 Goal 1 dev: https://github.com/Beking0912/llvm-pass-skeleton
-2. Part 1 Goal 1 submission: https://github.com/Beking0912/llvm-pass-skeleton
-3. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
-4. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
+1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
+2. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
+3. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
+4. part 2 dev & submission: https://github.com/vrgottiv/CompilerProject
+5. Part 3: https://github.com/Beking0912/CourseProject
