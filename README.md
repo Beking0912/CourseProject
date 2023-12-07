@@ -3,7 +3,8 @@
 It's for LLVM 17.
 
 ## Contribution
-Biqing Su(bsu5)
+- Part 1: Biqing Su(bsu5)
+- Part 2: Veerendra Gottiveeti (vrgottiv)
 
 ## Compile & Run
 1. Make the script executable by running `chmod +x setup_and_run.sh` in the terminal.
