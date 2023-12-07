@@ -63,7 +63,7 @@ $ cc fileX.o rtlib.o
 $ ./a.out
 ```
 
-## Test Files
+# Test Files
 
 ### **test0.c**
 - **Type:** small contrived program
@@ -87,3 +87,8 @@ $ ./a.out
 - **Changes made:** added function getch; moved the main to the end.
 - **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
 
+# Repo Links
+1. Part 1 Goal 1 dev: https://github.com/Beking0912/llvm-pass-skeleton
+2. Part 1 Goal 1 submission: https://github.com/Beking0912/llvm-pass-skeleton
+3. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
+4. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
