@@ -10,103 +10,166 @@
 #include "llvm/Analysis/ScalarEvolution.h"
 #include "llvm/Analysis/ScalarEvolutionExpressions.h"
 #include "llvm/IR/InstIterator.h"
+#include "llvm/IR/DebugInfoMetadata.h" 
 #include <set>
 #include <map>
-
 
 using namespace llvm;
 
 namespace {
 
-
 struct SkeletonPass : public PassInfoMixin<SkeletonPass> {
   
+  //stores the key points of the branches
   std::set<int> keyPointLines;
-  std::vector<Value*> inputVariables;
-
 
 void findInputVariables(Function &F) {
-  std::set<std::string> ioFunctions = {"getc", "@_fopen", "scanf", "fclose", "fread", "fwrite", "fopen", "_fopen", "\01_fopen"};
-  std::map<Value*, int> inputVarLines;
+  
+  //set of i/o functions to look for in the program
+  std::set<std::string> ioFunctions = {"getc", "@_fopen", "scanf", "fclose", "fread", "fwrite", "_fread", "_fwrite", "_@fread", "_@fwrite", "\01_fread", "\01_fwrite", "fopen", "_fopen", "\01_fopen"};
+  //stores line numbers of where variables are used
   std::vector<Value*> inputVariables;
-  std::map<Value*, int> filePointerInitLines;
+  //map values to their variable names
+  std::map<Value*, std::string> valueToNameMap;
+  //Store usage lines of variables
+  std::map<std::string, std::vector<int>> variableUsageLines;
+  //store line numbers of i/o functions
+  std::set<int> ioFunctionLines;
+  //map to store variable and their initial lines
+  std::map<Value*, std::pair<std::string, int>> varNameAndInitLineMap;
+  //store unique variables per line
+  std::map<int, std::set<std::string>> uniqueVariablesPerLine;
 
+  // Iterate over all instructions in the function
   for (Instruction &I : instructions(F)) {
-    if (CallInst *CI = dyn_cast<CallInst>(&I)) {
-      Function *calledFunc = CI->getCalledFunction();   
-      if (calledFunc && ioFunctions.find(calledFunc->getName().str()) != ioFunctions.end()) {
-        int ioCallLine = CI->getDebugLoc().getLine();
-        errs() << "\nFound I/O call at line: " << ioCallLine << "\n\n";
-        
-        if (calledFunc->getName() == "\01_fopen" || calledFunc->getName() == "fopen" || calledFunc->getName() == "_fopen") {
-        
-          Value *filePointer = CI;
-          filePointerInitLines[filePointer] = ioCallLine;
-          errs() << "File pointer initialized at line: " << ioCallLine << "\n";
-          
-          //Need to implement it where it finds the name of the file pointer and finds the 
-          //occurrences of that name and prints the line numbers with that name
-          //For example the name would be "name" for this line FILE *name = fopen("file.txt", "r");
-          
-        }
-		
-		else if (calledFunc->getName() == "scanf") {
-		
-		  for (unsigned int i = 1; i < CI->getNumOperands() - 1; i++) {
-            Value *operand = CI->getOperand(i);
-            if (operand->getType()->isPointerTy()) {
-              errs() << "Input variable (pointer) operand found: " << *operand << "\n";
-              inputVariables.push_back(operand);
-              inputVarLines[operand] = ioCallLine;
-
-              for (User *U : operand->users()) {
-                if (Instruction *useInst = dyn_cast<Instruction>(U)) {
-                  errs() << "Input variable used at line: " << useInst->getDebugLoc().getLine() << "\n";
-                }
-              }
-            }
-          }   
-		}
-		
-		else if (calledFunc->getName() == "getc" || calledFunc->getName() == "fclose" ) {
-		
-		  Value *operand = CI->getOperand(0); 
-          if (operand->getType()->isPointerTy()) {
-          
-            std::string operandName;
-            raw_string_ostream OS(operandName);
-            operand->printAsOperand(OS, false);
-            operandName = OS.str();
-            
-            errs() << "Input variable (file pointer) operand found: " << *operand << "\n";
-            inputVariables.push_back(operand);
-            inputVarLines[operand] = ioCallLine;
-            
-            
-            for (Instruction &I : instructions(F)) {
-  		      for (User::op_iterator OI = I.op_begin(), OE = I.op_end(); OI != OE; ++OI) {
-    		    if (isa<Constant>(OI)) {
-      			  continue;
-    		    }
-    
-      		    Value *operand = *OI;
-                std::string operandStr;
-                raw_string_ostream OS(operandStr);
-                operand->printAsOperand(OS, false);
-    
-                if (operandName != "" && operandStr.find(operandName) != std::string::npos) {
-                  errs() << "Found input variable at line: " << I.getDebugLoc().getLine() << "\n";
-                }
-              }
-            }
-            
-          }
-		  
-		}
+    if (auto *DDI = dyn_cast<DbgDeclareInst>(&I)) {
+      //get the actual variable name
+      if (auto *Var = DDI->getVariable()) {
+        valueToNameMap[DDI->getAddress()] = Var->getName().str();
       }
     }
   }
 
+  // Iterate over all instructions in the function
+  for (Instruction &I : instructions(F)) {
+    //get the actual variable name
+    if (auto *DDI = dyn_cast<DbgDeclareInst>(&I)) {
+      if (auto *Var = DDI->getVariable()) {
+        int initLine = I.getDebugLoc().getLine();
+        varNameAndInitLineMap[DDI->getAddress()] = std::make_pair(Var->getName().str(), initLine);
+      }
+    }
+  }
+
+  for (Instruction &I : instructions(F)) {
+    if (CallInst *CI = dyn_cast<CallInst>(&I)) {
+      Function *calledFunc = CI->getCalledFunction();
+      //Handles I/O function calls
+      if (calledFunc && ioFunctions.find(calledFunc->getName().str()) != ioFunctions.end()) {
+        int ioCallLine = I.getDebugLoc().getLine();
+        if (ioCallLine > 0) {
+          ioFunctionLines.insert(ioCallLine);
+        }
+      }
+    }
+
+	// Check operands to find usage of variables
+    for (User::op_iterator OI = I.op_begin(), OE = I.op_end(); OI != OE; ++OI) {
+      Value *operand = *OI;
+      if (valueToNameMap.find(operand) != valueToNameMap.end()) {
+        std::string varName = valueToNameMap[operand];
+        int lineNum = I.getDebugLoc().getLine();
+
+        if (lineNum > 0) {
+          variableUsageLines[varName].push_back(lineNum);
+        }
+      }
+    }
+  }
+
+  //fill in the map
+  for (const auto &varEntry : variableUsageLines) {
+    for (int line : varEntry.second) {
+      uniqueVariablesPerLine[line].insert(varEntry.first);
+    }
+  }
+
+  //check if any variable is only used on a single line
+  bool anyVariableUsedOnSingleLine = false;
+  
+  //check if any variable is only used on a single line
+  for (const auto &varEntry : variableUsageLines) {
+    const std::vector<int> &usageLines = varEntry.second;
+    std::set<int> uniqueLines(usageLines.begin(), usageLines.end());
+
+    if (uniqueLines.size() == 1) {
+      anyVariableUsedOnSingleLine = true;
+      break;
+    }
+  }
+
+  // Logic to detect seminal inputs based on where the variables are used
+  if (anyVariableUsedOnSingleLine) {
+    errs() << "\nSeminal Inputs Detection:\n";
+    for (const auto &varEntry : variableUsageLines) {
+      const std::string &varName = varEntry.first;
+      const std::vector<int> &usageLines = varEntry.second;
+
+      std::set<int> uniqueLines(usageLines.begin(), usageLines.end());
+      bool usedInIOFunction = false;
+      bool usedOnKeyPointLine = false;
+
+      for (int line : uniqueLines) {
+        if (ioFunctionLines.find(line) != ioFunctionLines.end()) {
+          usedInIOFunction = true;
+        }
+        if (keyPointLines.find(line) != keyPointLines.end()) {
+          usedOnKeyPointLine = true;
+        }
+      }
+
+      if (usedInIOFunction && usedOnKeyPointLine) {
+        for (const auto &varInfo : varNameAndInitLineMap) {
+          if (varInfo.second.first == varName) {
+            int initLine = varInfo.second.second;
+            errs() << "Line " << initLine << ": " << varName << "\n";
+            break;
+          }
+        }
+      }
+    }
+  } 
+  else {
+    errs() << "\nSeminal Inputs Detection:\n";
+    for (const auto &varEntry : variableUsageLines) {
+      const std::string &varName = varEntry.first;
+      const std::vector<int> &usageLines = varEntry.second;
+
+      bool usedInIOFunction = false;
+      bool usedOnKeyPointLine = false;
+
+      for (int line : usageLines) {
+        if (ioFunctionLines.find(line) != ioFunctionLines.end() && uniqueVariablesPerLine[line].size() == 1) {
+          usedInIOFunction = true;
+        }
+        if (keyPointLines.find(line) != keyPointLines.end()) {
+          usedOnKeyPointLine = true;
+        }
+      }
+
+      if (usedInIOFunction && usedOnKeyPointLine) {
+        for (const auto &varInfo : varNameAndInitLineMap) {
+          if (varInfo.second.first == varName) {
+            int initLine = varInfo.second.second;
+            errs() << "Line " << initLine << ": " << varName << "\n";
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  //Matching the lines of the variables with proper i/o function with those of key points to get the runtime variable
   std::set<Value*> keyPointInfluencers;
   for (Value *inputVar : inputVariables) {
     bool isKeyPointInfluencer = false;
@@ -115,7 +178,7 @@ void findInputVariables(Function &F) {
         int useLine = useInst->getDebugLoc().getLine();
         if (keyPointLines.find(useLine) != keyPointLines.end()) {
           isKeyPointInfluencer = true;
-          errs() << "\nUsing Line " << useLine << ", the input variable determining runtime is: " << *inputVar << "\n";
+          errs() << "\nLine " << useLine << ": " << *inputVar << "\n";
           break;
         }
       }
@@ -124,7 +187,6 @@ void findInputVariables(Function &F) {
       keyPointInfluencers.insert(inputVar);
     }
   }
-  
 }
   
 PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
@@ -133,6 +195,7 @@ PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
 
     int branchNumber = 0;
 
+    //getting the keypoints and branches from Part 1
     for (Function &F : M.functions()) {
 
       LLVMContext &Ctx = F.getContext();
@@ -179,11 +242,13 @@ PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
       }
     }
     
+    //getting the branches/key points from the branch dictionary
     for (const auto &entry : branchDictionary) {
       const std::tuple<std::string, int, int> &location = entry.second;
       keyPointLines.insert(std::get<1>(location));
     }
     
+    //call the input variables
     for (Function &F : M) {
       if (!F.isDeclaration()) {
         findInputVariables(F);
@@ -197,7 +262,7 @@ PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
       errs() << branchID << ": " << std::get<0>(location) << ", "
              << std::get<1>(location) << ", " << std::get<2>(location) << "\n";
     }
-            
+                
     return PreservedAnalyses::all();
   }
 };
