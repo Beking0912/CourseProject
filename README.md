@@ -48,7 +48,61 @@ br_1
 ```
 
 # Part 2
-describe part 2 here...
+
+1. Make the script executable by running `chmod +x setup_and_run.sh` in the terminal.
+2. Execute the script by typing `./setup_and_run.sh`.
+
+```c
+#include <stdio.h>
+#include <stdlib.h> 
+
+int main() {
+  
+  char str1[1000]; 
+  
+  FILE *name = fopen("file.txt", "r"); 
+  
+  int c; 
+    
+  int len = 0;
+    
+  if (name == NULL) {
+    
+    perror("Error opening file");
+    
+    return -1;
+  
+  }
+  
+  while (1) {
+  
+    c = getc(name);
+    
+    if (c == EOF) break;
+        
+    str1[len++] = c;
+        
+    if (len >= 999) break; 
+  
+  }
+    
+  str1[len] = '\0'; 
+    
+  printf("%s\n", str1); 
+  
+  fclose(name);
+
+  return 0;
+
+}
+```
+
+## Output
+```
+Seminal Inputs Detection:
+Line 8: name
+```
+
 
 ## Manually Compile & Run
 ```
