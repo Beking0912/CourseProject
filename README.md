@@ -112,9 +112,9 @@ $ cmake ..
 $ make
 $ cd ..
 
-$ cc -c rtlib.c
+$ cc -c logPrint.c
 $ clang -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c fileX.c -g
-$ cc fileX.o rtlib.o
+$ cc fileX.o logPrint.o
 $ ./a.out
 ```
 
@@ -146,5 +146,6 @@ $ ./a.out
 1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
 2. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
 3. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
-4. part 2 dev & submission: https://github.com/vrgottiv/CompilerProject
-5. Part 3: https://github.com/Beking0912/CourseProject
+4. part 2 dev: https://github.com/vrgottiv/CompilerProject
+5. part 2 submission: https://github.com/VeerendraG28/CourseProject
+6. Part 3: https://github.com/Beking0912/CourseProject
