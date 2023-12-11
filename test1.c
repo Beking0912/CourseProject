@@ -1,23 +1,23 @@
 #include <stdio.h>
 
 // Define a function matching the signature of the function pointer
-void fun(int x) {
-    printf("Function fun called with argument %d\n", x);
+void fun() {
+    printf("Function fun called\n");
 }
 
 int main() {
     // Function pointer declaration and initialization
-    void (*fun_ptr)(int) = &fun;
+    void (*fun_ptr)() = &fun;
     
-    // Call the function through the pointer with an argument
-    int c = 10;
-    (*fun_ptr)(c);
+    // Call the function through the pointer
+    (*fun_ptr)();
 
-    // Simple loop to modify the value of c
+    // Simple loop to perform some operations
+    int c = 10;
     for (int i = 0; i < 3; i++) {
         c = c + 1;
     }
 
-    // Return the modified value of c
+    // Return a value
     return c;
 }
