@@ -125,8 +125,8 @@ Line 6: name
 1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
 2. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
 3. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
-4. part 2 dev: https://github.com/vrgottiv/CompilerProject
-5. part 2 submission: https://github.com/VeerendraG28/CourseProject
+4. part 2 dev: https://github.ncsu.edu/vrgottiv/llvmpart2devrepo.git
+5. part 2 submission: https://github.ncsu.edu/vrgottiv/llvmpart2submissionrepo.git
 6. Part 3: https://github.com/Beking0912/CourseProject
 
 # Manually Compile & Run
