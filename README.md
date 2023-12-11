@@ -59,7 +59,7 @@ br_1
 ### **test2.c** - For Part 1 & 3
 - **Type:** small contrived program
 - **Code source:** generate by gpt4
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Run test:** change `test1` to `test2` in `setup_and_run.sh` before executing the script.
 - **Result:**
 <img src="https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png" width="50%">
 
@@ -68,7 +68,7 @@ br_1
 - **Code source:** [Employee Management System github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
 - **Number of non-comment non-blank lines:** 583 lines
 - **Changes made:** added function getch; moved the main to the end.
-- **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
+- **Run test:** change `test1` to `test3` in `setup_and_run.sh` before executing the script.
 - **Result:**
 <img src="https://s2.loli.net/2023/12/11/OuDQChPKmrBtyVc.png" width="50%">
 
@@ -110,16 +110,26 @@ Line 6: name
 ### **test4.c** - For Part 2 & 3
 - **Type:** small contrived program
 - **Code source:** from project description
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Run test:** change `test1` to `test4` in `setup_and_run.sh` before executing the script.
 - **Result:**
 <img src="https://s2.loli.net/2023/12/11/fB2gUZ36xOKTvha.png" width="50%">
 
 ### **test5.c** - For Part 2 & 3
 - **Type:** small contrived program
 - **Code source:** from project description
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Run test:** change `test1` to `test5` in `setup_and_run.sh` before executing the script.
 - **Result:**
 <img src="https://s2.loli.net/2023/12/11/TGwaouyHV4BZFkO.png" width="50%">
+
+### **test6.c** - For Part 2 & 3
+- **Type:** real-world substitute
+- **Code source:** [Restaurant Management System github link](https://github.com/Shah-Aayush/RestaurantManagementSystem/blob/main/project.c)
+- **Number of lines:** 505 lines
+- **Changes made:** no changes made.
+- **Run test:** change `test1` to `test6` in `setup_and_run.sh` before executing the script.
+- **Result:**
+<img src="https://s2.loli.net/2023/12/12/rwRzyvAnTsNUHD4.png" width="50%">
+
 
 # Repo Links
 1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
