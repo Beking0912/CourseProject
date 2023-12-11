@@ -22,37 +22,40 @@ struct SkeletonPass : public PassInfoMixin<SkeletonPass> {
   
   //stores the key points of the branches
   std::set<int> keyPointLines;
-
-void findInputVariables(Function &F) {
-  
   //set of i/o functions to look for in the program
   std::set<std::string> ioFunctions = {"getc", "@_fopen", "scanf", "fclose", "fread", "fwrite", "_fread", "_fwrite", "_@fread", "_@fwrite", "\01_fread", "\01_fwrite", "fopen", "_fopen", "\01_fopen"};
   //stores line numbers of where variables are used
   std::vector<Value*> inputVariables;
   //map values to their variable names
   std::map<Value*, std::string> valueToNameMap;
-  //Store usage lines of variables
-  std::map<std::string, std::vector<int>> variableUsageLines;
   //store line numbers of i/o functions
   std::set<int> ioFunctionLines;
   //map to store variable and their initial lines
   std::map<Value*, std::pair<std::string, int>> varNameAndInitLineMap;
-  //store unique variables per line
+  //map to store variable and where their used in the programs
+  std::map<std::string, std::vector<int>> variableUsageLines;
+  //map to store variable and how unique they are in the lines
   std::map<int, std::set<std::string>> uniqueVariablesPerLine;
+  //map to store name to value
+  std::map<std::string, llvm::Value*> nameToValueMap;
+
+void findInputVariables(Function &F) {
 
   // Iterate over all instructions in the function
   for (Instruction &I : instructions(F)) {
     if (auto *DDI = dyn_cast<DbgDeclareInst>(&I)) {
-      //get the actual variable name
+      // Get the actual variable name
       if (auto *Var = DDI->getVariable()) {
-        valueToNameMap[DDI->getAddress()] = Var->getName().str();
+        llvm::Value* varAddress = DDI->getAddress();
+        std::string varName = Var->getName().str();
+        valueToNameMap[varAddress] = varName;
+        nameToValueMap[varName] = varAddress;
       }
     }
   }
 
   // Iterate over all instructions in the function
   for (Instruction &I : instructions(F)) {
-    //get the actual variable name
     if (auto *DDI = dyn_cast<DbgDeclareInst>(&I)) {
       if (auto *Var = DDI->getVariable()) {
         int initLine = I.getDebugLoc().getLine();
@@ -64,7 +67,6 @@ void findInputVariables(Function &F) {
   for (Instruction &I : instructions(F)) {
     if (CallInst *CI = dyn_cast<CallInst>(&I)) {
       Function *calledFunc = CI->getCalledFunction();
-      //Handles I/O function calls
       if (calledFunc && ioFunctions.find(calledFunc->getName().str()) != ioFunctions.end()) {
         int ioCallLine = I.getDebugLoc().getLine();
         if (ioCallLine > 0) {
@@ -73,7 +75,11 @@ void findInputVariables(Function &F) {
       }
     }
 
-	// Check operands to find usage of variables
+    if (!F.arg_empty()) {
+      continue; 
+    }
+
+    // Check operands to find usage of variables
     for (User::op_iterator OI = I.op_begin(), OE = I.op_end(); OI != OE; ++OI) {
       Value *operand = *OI;
       if (valueToNameMap.find(operand) != valueToNameMap.end()) {
@@ -87,17 +93,16 @@ void findInputVariables(Function &F) {
     }
   }
 
-  //fill in the map
+  // Fill in the map
   for (const auto &varEntry : variableUsageLines) {
     for (int line : varEntry.second) {
       uniqueVariablesPerLine[line].insert(varEntry.first);
     }
   }
 
-  //check if any variable is only used on a single line
+  // Check if any variable is only used on a single line
   bool anyVariableUsedOnSingleLine = false;
-  
-  //check if any variable is only used on a single line
+
   for (const auto &varEntry : variableUsageLines) {
     const std::vector<int> &usageLines = varEntry.second;
     std::set<int> uniqueLines(usageLines.begin(), usageLines.end());
@@ -108,78 +113,69 @@ void findInputVariables(Function &F) {
     }
   }
 
-  // Logic to detect seminal inputs based on where the variables are used
-  if (anyVariableUsedOnSingleLine) {
-    errs() << "\nSeminal Inputs Detection:\n";
-    for (const auto &varEntry : variableUsageLines) {
-      const std::string &varName = varEntry.first;
-      const std::vector<int> &usageLines = varEntry.second;
+  //Code to print out the seminal inputs and proper variable determining runtime
+  errs() << "\nSeminal Inputs Detection:\n";
+  std::map<std::string, int> keyPointLineFrequency;
+  std::string mostInfluentialVar;
+  int highestFrequency = 0;
+  const int criticalContextWeight = 5;
 
-      std::set<int> uniqueLines(usageLines.begin(), usageLines.end());
-      bool usedInIOFunction = false;
-      bool usedOnKeyPointLine = false;
+  for (const auto &varEntry : variableUsageLines) {
+    const std::string &varName = varEntry.first;
+    const std::vector<int> &usageLines = varEntry.second;
 
-      for (int line : uniqueLines) {
-        if (ioFunctionLines.find(line) != ioFunctionLines.end()) {
-          usedInIOFunction = true;
-        }
-        if (keyPointLines.find(line) != keyPointLines.end()) {
-          usedOnKeyPointLine = true;
-        }
+    std::set<int> uniqueLines(usageLines.begin(), usageLines.end());
+    bool usedInIOFunction = false;
+    bool usedOnKeyPointLine = false;
+
+    for (int line : uniqueLines) {
+      if (ioFunctionLines.find(line) != ioFunctionLines.end()) {
+        usedInIOFunction = true;
+        keyPointLineFrequency[varName] += criticalContextWeight;
       }
-
-      if (usedInIOFunction && usedOnKeyPointLine) {
-        for (const auto &varInfo : varNameAndInitLineMap) {
-          if (varInfo.second.first == varName) {
-            int initLine = varInfo.second.second;
-            errs() << "Line " << initLine << ": " << varName << "\n";
-            break;
-          }
-        }
+      if (keyPointLines.find(line) != keyPointLines.end()) {
+        usedOnKeyPointLine = true;
+        keyPointLineFrequency[varName]++;
       }
     }
-  } 
-  else {
-    errs() << "\nSeminal Inputs Detection:\n";
-    for (const auto &varEntry : variableUsageLines) {
-      const std::string &varName = varEntry.first;
-      const std::vector<int> &usageLines = varEntry.second;
 
-      bool usedInIOFunction = false;
-      bool usedOnKeyPointLine = false;
-
-      for (int line : usageLines) {
-        if (ioFunctionLines.find(line) != ioFunctionLines.end() && uniqueVariablesPerLine[line].size() == 1) {
-          usedInIOFunction = true;
-        }
-        if (keyPointLines.find(line) != keyPointLines.end()) {
-          usedOnKeyPointLine = true;
-        }
-      }
-
-      if (usedInIOFunction && usedOnKeyPointLine) {
-        for (const auto &varInfo : varNameAndInitLineMap) {
-          if (varInfo.second.first == varName) {
-            int initLine = varInfo.second.second;
-            errs() << "Line " << initLine << ": " << varName << "\n";
-            break;
-          }
-        }
+    if (usedInIOFunction && usedOnKeyPointLine) {
+      if (keyPointLineFrequency[varName] > highestFrequency) {
+        mostInfluentialVar = varName;
+        highestFrequency = keyPointLineFrequency[varName];
       }
     }
   }
 
-  //Matching the lines of the variables with proper i/o function with those of key points to get the runtime variable
+  if (highestFrequency > 0) {
+    auto valueIt = nameToValueMap.find(mostInfluentialVar);
+    if (valueIt != nameToValueMap.end()) {
+      auto varInitInfo = varNameAndInitLineMap.find(valueIt->second);
+      if (varInitInfo != varNameAndInitLineMap.end()) {
+        errs() << "Line " << varInitInfo->second.second << ": " << mostInfluentialVar << "\n";
+      }
+    } else {
+      errs() << "Value for the most influential variable not found.\n";
+    }
+  } else {
+    errs() << "No variable seminal input affecting runtime in this function. Might be a constant.\n";
+  }
+
+  // Matching the lines of the variables with proper i/o function with those of key points
   std::set<Value*> keyPointInfluencers;
   for (Value *inputVar : inputVariables) {
+    if (!inputVar) continue; // Null check
+
     bool isKeyPointInfluencer = false;
     for (User *U : inputVar->users()) {
       if (Instruction *useInst = dyn_cast<Instruction>(U)) {
-        int useLine = useInst->getDebugLoc().getLine();
-        if (keyPointLines.find(useLine) != keyPointLines.end()) {
-          isKeyPointInfluencer = true;
-          errs() << "\nLine " << useLine << ": " << *inputVar << "\n";
-          break;
+        if (auto DL = useInst->getDebugLoc()) {
+          int useLine = DL.getLine();
+          if (keyPointLines.find(useLine) != keyPointLines.end()) {
+            isKeyPointInfluencer = true;
+            errs() << "\nLine " << useLine << ": " << *inputVar << "\n";
+            break;
+          }
         }
       }
     }
@@ -188,6 +184,7 @@ void findInputVariables(Function &F) {
     }
   }
 }
+
   
 PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
     std::set<int> processedLines;
