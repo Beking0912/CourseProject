@@ -54,23 +54,23 @@ br_1
 - **Code source:** from project description
 - **Run test:** execute the `setup_and_run.sh` script.
 - **Result:**
-![test1](https://s2.loli.net/2023/12/11/rLUSTMjKIlOZw9A.png)
+<img src="https://s2.loli.net/2023/12/11/rLUSTMjKIlOZw9A.png" width="50%">
 
 ### **test2.c** - For Part 1 & 3
 - **Type:** small contrived program
 - **Code source:** generate by gpt4
 - **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
 - **Result:**
-![test2](https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png)
+<img src="https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png" width="50%">
 
 ### **test3.c** - For Part 1 & 3
 - **Type:** real-world substitute
-- **Code source:** [github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
+- **Code source:** [Employee Management System github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
 - **Number of non-comment non-blank lines:** 583 lines
 - **Changes made:** added function getch; moved the main to the end.
 - **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
 - **Result:**
-![test3](https://s2.loli.net/2023/12/11/OuDQChPKmrBtyVc.png)
+<img src="https://s2.loli.net/2023/12/11/OuDQChPKmrBtyVc.png" width="50%">
 
 # Part 2
 ## Input
@@ -112,14 +112,14 @@ Line 6: name
 - **Code source:** from project description
 - **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
 - **Result:**
-![test4](https://s2.loli.net/2023/12/11/fB2gUZ36xOKTvha.png)
+<img src="https://s2.loli.net/2023/12/11/fB2gUZ36xOKTvha.png" width="50%">
 
 ### **test5.c** - For Part 2 & 3
 - **Type:** small contrived program
 - **Code source:** from project description
 - **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
 - **Result:**
-![test5](https://s2.loli.net/2023/12/11/TGwaouyHV4BZFkO.png)
+<img src="https://s2.loli.net/2023/12/11/TGwaouyHV4BZFkO.png" width="50%">
 
 # Repo Links
 1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
