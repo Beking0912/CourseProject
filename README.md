@@ -128,7 +128,7 @@ Line 6: name
 - **Changes made:** no changes made.
 - **Run test:** change `test1` to `test6` in `setup_and_run.sh` before executing the script.
 - **Result:**
-<img src="https://s2.loli.net/2023/12/12/rwRzyvAnTsNUHD4.png" width="50%">
+<img src="https://s2.loli.net/2023/12/12/rwRzyvAnTsNUHD4.png" width="65%">
 
 
 # Repo Links
