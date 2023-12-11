@@ -113,34 +113,39 @@ $ make
 $ cd ..
 
 $ cc -c logPrint.c
-$ clang -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c fileX.c -g
-$ cc fileX.o logPrint.o
+$ clang -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c test1.c -g
+$ cc test1.o logPrint.o
 $ ./a.out
 ```
 
 # Test Files
 
-### **test0.c**
+### **test1.c** - For Part 1 & 3
 - **Type:** small contrived program
 - **Code source:** from project description
 - **Run test:** execute the `setup_and_run.sh` script.
 
-### **test1.c**
+### **test2.c** - For Part 1 & 3
 - **Type:** small contrived program
-- **Code source:** from project description
+- **Code source:** generate by gpt4
 - **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
 
-### **test2.c**
-- **Type:** small contrived program
-- **Code source:** from project description
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
-
-### **test3.c**
+### **test3.c** - For Part 1 & 3
 - **Type:** real-world substitute
 - **Code source:** [github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
 - **Number of non-comment non-blank lines:** 583 lines
 - **Changes made:** added function getch; moved the main to the end.
 - **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
+
+### **test4.c** - For Part 2 & 3
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+
+### **test5.c** - For Part 2 & 3
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
 
 # Repo Links
 1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton

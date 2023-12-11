@@ -249,11 +249,11 @@ PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
     }
     
     //call the input variables
-    for (Function &F : M) {
-      if (!F.isDeclaration()) {
-        findInputVariables(F);
-      }
-    }
+    // for (Function &F : M) {
+    //   if (!F.isDeclaration()) {
+    //     findInputVariables(F);
+    //   }
+    // }
     
     errs() << "\nBranch Dictionary:\n";
     for (const auto &entry : branchDictionary) {
