@@ -1,15 +1,15 @@
-# Part 1
-
-It's for LLVM 17.
-
 ## Contribution
 - Part 1: Biqing Su(bsu5)
 - Part 2: Veerendra Gottiveeti (vrgottiv)
 
 ## Compile & Run
-1. Make the script executable by running `chmod +x setup_and_run.sh` in the terminal.
-2. Execute the script by typing `./setup_and_run.sh`.
+It's for LLVM 17.
+```
+chmod +x setup_and_run.sh
+./setup_and_run.sh
+```
 
+# Part 1
 ## Input
 ```c
 #include <stdio.h>
@@ -47,64 +47,89 @@ br_0
 br_1
 ```
 
+## Test Files
+
+### **test1.c** - For Part 1 & 3
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** execute the `setup_and_run.sh` script.
+- **Result:**
+![test1](https://s2.loli.net/2023/12/11/rLUSTMjKIlOZw9A.png)
+
+### **test2.c** - For Part 1 & 3
+- **Type:** small contrived program
+- **Code source:** generate by gpt4
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Result:**
+![test2](https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png)
+
+### **test3.c** - For Part 1 & 3
+- **Type:** real-world substitute
+- **Code source:** [github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
+- **Number of non-comment non-blank lines:** 583 lines
+- **Changes made:** added function getch; moved the main to the end.
+- **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
+- **Result:**
+![test3](https://s2.loli.net/2023/12/11/OuDQChPKmrBtyVc.png)
+
 # Part 2
-
-1. Make the script executable by running `chmod +x setup_and_run.sh` in the terminal.
-2. Execute the script by typing `./setup_and_run.sh`.
-
+## Input
 ```c
 #include <stdio.h>
 #include <stdlib.h> 
 
 int main() {
-  
-  char str1[1000]; 
-  
-  FILE *name = fopen("file.txt", "r"); 
-  
-  int c; 
-    
-  int len = 0;
-    
-  if (name == NULL) {
-    
-    perror("Error opening file");
-    
-    return -1;
-  
-  }
-  
-  while (1) {
-  
-    c = getc(name);
-    
-    if (c == EOF) break;
-        
-    str1[len++] = c;
-        
-    if (len >= 999) break; 
-  
-  }
-    
-  str1[len] = '\0'; 
-    
-  printf("%s\n", str1); 
-  
-  fclose(name);
-
-  return 0;
-
+    char str1[1000];
+    FILE *name = fopen("file.txt", "r");
+    int c;
+    int len = 0;
+    if (name == NULL) {
+        perror("Error opening file");
+        return -1;
+    }
+    while (1) {
+        c = getc(name);
+        if (c == EOF) break;
+        str1[len++] = c;
+        if (len >= 999) break;
+    }
+    str1[len] = '\0';
+    printf("%s\n", str1);
+    fclose(name);
+    return 0;
 }
 ```
 
 ## Output
 ```
 Seminal Inputs Detection:
-Line 8: name
+Line 6: name
 ```
 
+## Test Files
+### **test4.c** - For Part 2 & 3
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Result:**
+![test4](https://s2.loli.net/2023/12/11/fB2gUZ36xOKTvha.png)
 
-## Manually Compile & Run
+### **test5.c** - For Part 2 & 3
+- **Type:** small contrived program
+- **Code source:** from project description
+- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
+- **Result:**
+![test5](https://s2.loli.net/2023/12/11/TGwaouyHV4BZFkO.png)
+
+# Repo Links
+1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
+2. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
+3. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
+4. part 2 dev: https://github.com/vrgottiv/CompilerProject
+5. part 2 submission: https://github.com/VeerendraG28/CourseProject
+6. Part 3: https://github.com/Beking0912/CourseProject
+
+# Manually Compile & Run
 ```
 $ mkdir build
 $ cd build
@@ -117,40 +142,3 @@ $ clang -fpass-plugin='build/skeleton/SkeletonPass.dylib' -c test1.c -g
 $ cc test1.o logPrint.o
 $ ./a.out
 ```
-
-# Test Files
-
-### **test1.c** - For Part 1 & 3
-- **Type:** small contrived program
-- **Code source:** from project description
-- **Run test:** execute the `setup_and_run.sh` script.
-
-### **test2.c** - For Part 1 & 3
-- **Type:** small contrived program
-- **Code source:** generate by gpt4
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
-
-### **test3.c** - For Part 1 & 3
-- **Type:** real-world substitute
-- **Code source:** [github link](https://github.com/ssoad/Employee-Management-System/blob/master/Employee%20Management%20System-github.c)
-- **Number of non-comment non-blank lines:** 583 lines
-- **Changes made:** added function getch; moved the main to the end.
-- **Run test:** change `test0` to `test3` in `setup_and_run.sh` before executing the script.
-
-### **test4.c** - For Part 2 & 3
-- **Type:** small contrived program
-- **Code source:** from project description
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
-
-### **test5.c** - For Part 2 & 3
-- **Type:** small contrived program
-- **Code source:** from project description
-- **Run test:** change `test0` to `test1` in `setup_and_run.sh` before executing the script.
-
-# Repo Links
-1. Part 1 Goal 1 dev & submission: https://github.com/Beking0912/llvm-pass-skeleton
-2. Part 1 Goal 2 dev: https://github.com/Beking0912/valgrind-customize-tool
-3. Part 1 Goal 2 submission: https://github.com/Beking0912/valgrind-submission
-4. part 2 dev: https://github.com/vrgottiv/CompilerProject
-5. part 2 submission: https://github.com/VeerendraG28/CourseProject
-6. Part 3: https://github.com/Beking0912/CourseProject
