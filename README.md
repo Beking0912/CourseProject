@@ -54,14 +54,15 @@ br_1
 - **Code source:** from project description
 - **Run test:** execute the `setup_and_run.sh` script.
 - **Result:**
-<img src="https://s2.loli.net/2023/12/11/rLUSTMjKIlOZw9A.png" width="50%">
+<img src="https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png" width="50%">
 
 ### **test2.c** - For Part 1 & 3
 - **Type:** small contrived program
 - **Code source:** generate by gpt4
 - **Run test:** change `test1` to `test2` in `setup_and_run.sh` before executing the script.
 - **Result:**
-<img src="https://s2.loli.net/2023/12/11/IN2onFDPiHdLk4A.png" width="50%">
+<img src="https://s2.loli.net/2023/12/11/rLUSTMjKIlOZw9A.png" width="50%">
+
 
 ### **test3.c** - For Part 1 & 3
 - **Type:** real-world substitute
